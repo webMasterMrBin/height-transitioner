@@ -15,21 +15,25 @@ function getCollapseAndExpandContainerFn(element: HTMLElement) {
     });
   };
 
+  const handleTransitionend = () => {
+    // 展开后移除transitionend事件, 确保不会重复注册
+    element!.removeEventListener('transitionend', handleTransitionend);
+
+    element!.style.height = 'auto';
+  };
+
   const expandContainer = () => {
     element!.style.height = `${element!.scrollHeight}px`;
     element!.style.opacity = '1';
 
-    const handleTransitionend = () => {
-      // 展开后移除transitionend事件, 确保不会重复注册
-      element!.removeEventListener('transitionend', handleTransitionend);
-
-      element!.style.height = 'auto';
-    };
-
     element!.addEventListener('transitionend', handleTransitionend);
   };
 
-  return { collapseContainer, expandContainer };
+  const cleanup = () => {
+    element!.removeEventListener('transitionend', handleTransitionend);
+  };
+
+  return { collapseContainer, expandContainer, cleanup };
 }
 
 export { getCollapseAndExpandContainerFn };
